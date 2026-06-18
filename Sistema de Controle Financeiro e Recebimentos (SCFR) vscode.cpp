@@ -3,14 +3,22 @@
 #include <stdlib.h>
 #include <math.h>
 
+/*
+#include <time.h>
+#include <locale.h>
+
+Locale Ã© para localizaÃ§Ã£o do idioma
+SÃ³ para deixar salvo caso o professor permitir. time.h Ã‰ para verificar o ano conforme o tempo atual
+*/
+
 #define LISTA 100
 
-// estrutura de data de registro 
+// estrutura de data de registro
 typedef struct Data
 {
- int dia;
- int mes;
- int ano;
+    int dia;
+    int mes;
+    int ano;
 }data;
 
 // estrutura de clientes
@@ -22,60 +30,297 @@ typedef struct Clientes
     data dataNascimento;
     char numeroCartao[20];
     char chavePix[30];
-}Cliente ;
+}Cliente;
 
-// Funções Financeiras
-// quanto recebeu
+// estrutura das vendas
+typedef struct Vendas
+{
+    int idVenda;
+    Cliente cliente;
+    float valorTotalVenda;
+    int formaPagamento;
+    int qtdeParcelas;
+    data dataVenda;
+    char observacao[50];
+}vendas;
+
+// estrutura das parcela
+typedef struct Parcelas
+{
+    int idParcela;
+    int idVenda;
+    int numeroDaParcela;
+    float valorDaParcela;
+    data dataVencimento;
+    data dataRecebimento;
+    char situacaoDaParcela;
+}Parcela;
+
+// FunÃ§Ãµes Financeiras
 float recibos();
-// ainda para receber
 float aindaReceber();
-// parcelas vencidas
 float parcelasVencidas();
-// debitos pendentes
 float debitosPendentes();
-// faturamento total da emprea
 float faturamentoTotal();
 
-// Funções de validação
-// validar CPF
-int validarCPF();
-// validar data
+// FunÃ§Ãµes de validaÃ§Ã£o
+int validarCPF(char cpf[]);
 int validarData(data d);
 // obs: usar regra do calendario gregoriano
-// validar telefone
-// obs: não esquecer de colocar 0 no inicio do ddd, e também ter 11 - 12 digitos (valores entre 0 - 9 )
-int validarTelefone();
-// validar cartão
-int valdiarCartao();
-//validar email
-int validarEmail();
+int validarTelefone(char telefone[]);
+// obs: nÃ£o esquecer de colocar 0 no inicio do ddd, e tambÃ©m ter 11 - 12 digitos (valores entre 0 - 9 )
+int validarCartao(char numeroCartao[]);
+int validarEmail (char email[]);
+int registroVendas();
+/*
+obs: Todas as vendas devem ser registradas com vinculo do cliente a venda denifirÃ¡ a forma de pagamento
+pagamento Ã  vista deverÃ¡ ser gerado apenas com uma parcela somente para venda
+Para pagamentos a prazo, deverÃ¡ ser gerado uma parcela para cada prestraÃ§Ã£o definida, estando vinculada Ã  venda e status incial "Em Aberto"
+*/
+int anoBissexto(int ano);
 
-//cadastro de clientes
+
+//Menu
 void cadastroClientes();
-
-//buscar clientes via Cpf, numero de cartao, chave pix e nome, ser exibido no final os dados
 void buscarClientes();
+int registroVendas();
+/*
+obs: Todas as vendas devem ser registradas com vinculo do cliente a venda denifirÃ¡ a forma de pagamento
+pagamento Ã  vista deverÃ¡ ser gerado apenas com uma parcela somente para venda
+Para pagamentos a prazo, deverÃ¡ ser gerado uma parcela para cada prestraÃ§Ã£o definida, estando vinculada Ã  venda e status incial "Em Aberto"
+*/
+int consultarVendas();
+/*
+Consultar com base nos dados da venda e parcela existente. O cliente pode ter mais de uma compra realizada
+*/
+
+// gerador automatico de parcelas
+void geradorParcelas();
 
 int main(){
-
-
+	int op;
+	
+	do{
+		printf("\nSISTEMA DE CONTROLE FINANCEIRO\n");
+		printf("\n1 - Cadastro de cliente\n");
+		printf("\n0 - Sair\n");
+		
+		scanf("%d", &op);
+		
+		getchar();
+		
+		switch(op){
+			case 1:
+				cadastroClientes();
+				break;
+			case 0:
+				printf("\nSaindo...\n");
+                break;
+  			default:
+				printf("\nDigite novamente\n");
+                break;
+		}
+	}while(op != 0);
 
     return 0;
 }
 
-int validaData(data d) {
-	while(data == 1){		
-	    if (d.dia < 1 || d.dia > 30) {
-	        return 0; 
-	    }
-	
-	    if (d.mes < 1 || d.mes > 12) {
-	        return 0;
-	    }
-	    
-	    if (d.ano < 1900 || d.ano > 2025) {
-	        return 0;
-	    }
+void cadastroClientes(){
+    Cliente listaClientes[LISTA];
+    int qtdClientes = 0;
+    
+    // verifica se a lista já está cheia
+    if (qtdClientes >= LISTA) {
+        printf("\nLimite de clientes cadastrados atingido!\n");
+        return; // sai da função
+    }
+
+    Cliente novoCliente;
+    
+    // CPF
+    printf("\nDigite o CPF: ");
+    fgets(novoCliente.CPF, 20, stdin);
+
+    // validando cpf
+    if(validarCPF(novoCliente.CPF) == 1){
+        printf("\nCPF valido!\n");
+    } else {
+        printf("\nCPF invalido!\n");
+    }
+
+    // Nome
+    printf("\nDigite o nome: ");
+    fgets(novoCliente.nome, 50, stdin);
+
+    // Telefone
+    printf("\nDigite o telefone: ");
+    fgets(novoCliente.telefone, 15, stdin);
+
+    if(validarTelefone(novoCliente.telefone) == 1){
+        printf("\nTelefone valido!\n");
+    } else {
+        printf("\nTelefone invalido!\n");
+    }
+
+    // Data de nascimento
+    printf("\nDigite o dia de seu nascimento: ");
+    scanf("%d", &novoCliente.dataNascimento.dia);
+
+    printf("\nDigite o mes de seu nascimento: ");
+    scanf("%d", &novoCliente.dataNascimento.mes);
+
+    printf("\nDigite o ano de seu nascimento: ");
+    scanf("%d", &novoCliente.dataNascimento.ano);
+
+    if(validarData(novoCliente.dataNascimento) == 1){
+        printf("\nData valida!\n");
+    } else {
+        printf("\nData invalida!\n");
+    }
+
+    // Numero de cartao
+    printf("\nDigite o numero do cartao: ");
+    fgets(novoCliente.numeroCartao, 20, stdin);
+
+    if(validarCartao(novoCliente.numeroCartao) == 1){
+        printf("\nNumero do cartao valido!\n");
+    } else {
+        printf("\nNumero do cartao invalido!\n");
+    }
+
+	// Chave Pix ou email
+	printf("\nDigite a sua chave Pix (somente email): ");
+	fgets(novoCliente.chavePix, 30, stdin);
+
+	if(validarEmail(novoCliente.chavePix) == 1){
+		printf("\nEmail/Pix valido!\n");
+	} else {
+		printf("\nEmail invalido!\n");
 	}
-    return 1; 
+	
+	listaClientes[qtdClientes] = novoCliente;
+    qtdClientes++;
+}
+
+int validarCartao(char numeroCartao[]){
+	int soma = 0, i = 0, tam = strlen(numeroCartao), casa = 0, digito;
+
+	// percorrer todos os numeros impar
+	for(i = tam - 1; i >= 0; i--){ // percorre cada numero de direita para esquerda 
+		
+		//alterar o tipo char para int
+		digito = numeroCartao[i] - '0';
+
+		//se for a posiÃ§Ã£o impar, ele dobra
+		if(casa == 1){
+			digito *= 2;
+		} if(digito > 9){ // NÃ£o deve ser mais do que nove a soma
+			digito -= 9;
+		}
+
+		soma += digito;
+
+		// alterar de 0 para 1 para o loop continuar
+		if(casa == 0){
+			casa = 1;
+		} else {
+			casa = 0; 
+		}
+	}
+
+	// se for divisivel por 10, o cartÃ£o Ã© valido
+	if(soma % 10 == 0){
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+int validarData(data d) {
+    // verificar ano
+    if(d.ano < 1900 || d.ano > 2026){
+        return 0;
+    }
+
+    // verifica o mes
+    if(d.mes < 1 || d.mes > 12){
+        return 0;
+    }
+
+    // colocando quantos dias tem por mes
+    int diasPorMes[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    // vendo se o mes de fevereiro Ã© ano bissexto
+    if(d.mes == 2 && anoBissexto(d.ano)){
+        diasPorMes[2] = 29;
+    }
+
+    // verificando o dia
+    if(d.dia < 1 || d.dia > diasPorMes[d.mes]){
+        return 0;
+    }
+    return 1;
+    // return 0 Ã© falso
+    // return 1 Ã© verdadeiro
+}
+
+int anoBissexto(int ano){
+    if ((ano % 4 == 0 && ano % 100 != 0) || (ano % 400 == 0)) {
+        return 1;
+    }
+    return 0;
+}
+
+//validando telefone
+int validarTelefone(char telefone[]) {
+    int TAM = strlen(telefone);
+    int i = 0;
+    if (TAM != 11 && TAM != 12) { return 0; }
+    if (telefone[0] != '0') { return 0; }
+
+    for(i = 0; i < TAM; i++) {
+        if (telefone[i] < '0' || telefone[i] > '9'){
+            return 0;
+        }
+    }
+    return 1;  
+}
+
+int validarCPF(char cpf[]){
+	int tam = strlen(CPF), i = 0, soma = 0, ;
+	
+	if(tam != 11){
+		return 0;
+	}
+	
+	
+	
+	return 1;
+}
+
+// validando o email
+int validarEmail (char email[]) {
+    int TAM = strlen(email);
+    int psAR = -1,psPonto = -1, qtdAR = 0;     //psAR Ã© a posiÃ§Ã£o do '@' e o psPonto Ã© a posiÃ§Ã£o do '.', o -1 Ã© 'nao encontrado'
+	int i = 0;
+	
+    for (i = 0; i < TAM; i++) {
+        if (email[i] == '@') {
+            qtdAR++;
+            psAR = i;
+        }
+    }
+
+    if (qtdAR != 1 || psAR < 2) { return 0; }
+    for (i = psAR + 1; i < TAM; i++) {
+        if (email[i] == '.') {
+        psPonto = i;
+        break;
+        }
+    }
+
+    if (psPonto == -1 || (psPonto - psAR - 1) < 2) { return 0; }
+    if ((TAM - 1 - psPonto) < 2) { return 0; }
+
+    return 1;
 }
