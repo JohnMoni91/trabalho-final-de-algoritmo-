@@ -10,9 +10,9 @@
 Locale é para localização do idioma
 Só para deixar salvo caso o professor permitir. time.h É para verificar o ano conforme o tempo atual
 */
-
+//Parcelas é maximo 12 mesmo?
 #define LISTA 100
-
+#define MAX_PARCELAS 12
 // estrutura de data de registro
 typedef struct Data
 {
@@ -53,7 +53,7 @@ typedef struct Parcelas
     float valorDaParcela;
     data dataVencimento;
     data dataRecebimento;
-    char situacaoDaParcela;
+    char situacaoDaParcela; // A: em aberto, R: recebido, V: vencido, C: cancelado
 }Parcela;
 
 // Funções Financeiras
@@ -95,7 +95,34 @@ Consultar com base nos dados da venda e parcela existente. O cliente pode ter ma
 */
 
 // gerador automatico de parcelas
-void geradorParcelas();
+void geradorParcelas(int idVenda, float valorTotal, int qtdd, Data dataVenda) {
+	Parcela p;
+    Data vencimento;
+    float valorParcela;
+    int i;
+
+	valorParcela = valorTotal / qtde;
+    vencimento = dataVenda;
+	for (i = 0; i < qtde; i++) {
+        if (qtdParcelas >= MAX_PARCELAS) {
+            printf("Limite de parcelas atingido\n");
+            return;
+        	}
+		}
+	vencimento = diasPorMes(vencimento);
+ 		p.idParcela = proximoIdParcela++;
+        p.idVenda  = idVenda;
+        p.numeroDaParcela = i + 1;
+        p.valorDaParcela = valorParcela;
+        p.dataVencimento =  vencimento;
+        p.dataRecebimento.dia = 0;
+        p.dataRecebimento.mes = 0;
+        p.dataRecebimento.ano = 0;
+        p.situacaoDaParcela = 'A'; // A de Em aberto
+ 			listaParcelas[qtdParcelas] = p;
+        	qtdParcelas++;
+    }
+}
 
 int main(){
 	int op;
@@ -346,4 +373,39 @@ int validarEmail (char email[]) {
     if ((TAM - 1 - psPonto) < 2) { return 0; }
 
     return 1;
+}
+//
+// vou fazer as financeiras aqui embaixo
+// fica muito ruim?
+float recibos() {
+    float total = 0;
+    int i;
+    for (i = 0; i < qtdParcelas; i++) {
+        if (listaParcelas[i].situacaoDaParcela == 'R') {
+            total += listaParcelas[i].valorDaParcela;
+        }
+    }
+    return total;
+}
+
+float aindaReceber() {
+    float total = 0;
+    int i;
+    for (i = 0; i < qtdParcelas; i++) {
+        if (listaParcelas[i].situacaoDaParcela == 'A') {
+            total += listaParcelas[i].valorDaParcela;
+        }
+    }
+    return total;
+}
+
+float parcelasVencidas() {
+    float total = 0;
+    int i;
+    for (i = 0; i < qtdParcelas; i++) {
+        if (listaParcelas[i].situacaoDaParcela == 'V') {
+            total += listaParcelas[i].valorDaParcela;
+        }
+    }
+    return total;
 }
