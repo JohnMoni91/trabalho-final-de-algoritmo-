@@ -303,7 +303,7 @@ int validarCPF(char cpf[]){
         return 0;
     }
 
-    // 3 multiplicar os primeiros digitos
+    // 3 multiplicar os primeiros digitos. Já que o 10 numero é para proteger o 9 primeiros digitos
     for(i = 0; i < 9; i++){
             atualNumero = cpf[i] - '0';
             soma += (atualNumero * peso);
@@ -331,7 +331,8 @@ int validarCPF(char cpf[]){
     soma = 0;
     peso = 11;
 
-    // Multiplicar os 10 primeiros nuemros 
+    // Multiplicar os 10 primeiros numeros. O 11 numero do CPF serve para proteger os 9 numeros bases e o 10 numero.
+    // deve separar o 10 e 9 numero para poder fazer a validação
     for(i = 0; i < 10; i++){
         atualNumero = cpf[i] - '0';
         soma += (atualNumero * peso);
@@ -352,6 +353,7 @@ int validarCPF(char cpf[]){
     }
 	return 1;
 }
+
 
 // validando o email
 int validarEmail (char email[]) {
