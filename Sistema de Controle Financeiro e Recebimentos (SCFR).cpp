@@ -7,8 +7,8 @@
 #include <time.h>
 #include <locale.h>
 
-Locale Ã© para localizaÃ§Ã£o do idioma
-SÃ³ para deixar salvo caso o professor permitir. time.h Ã‰ para verificar o ano conforme o tempo atual
+Locale é para localização do idioma
+Só para deixar salvo caso o professor permitir. time.h É para verificar o ano conforme o tempo atual
 */
 
 #define LISTA 100
@@ -56,26 +56,26 @@ typedef struct Parcelas
     char situacaoDaParcela;
 }Parcela;
 
-// FunÃ§Ãµes Financeiras
+// Funções Financeiras
 float recibos();
 float aindaReceber();
 float parcelasVencidas();
 float debitosPendentes();
 float faturamentoTotal();
 
-// FunÃ§Ãµes de validaÃ§Ã£o
+// Funções de validação
 int validarCPF(char cpf[]);
 int validarData(data d);
 // obs: usar regra do calendario gregoriano
 int validarTelefone(char telefone[]);
-// obs: nÃ£o esquecer de colocar 0 no inicio do ddd, e tambÃ©m ter 11 - 12 digitos (valores entre 0 - 9 )
+// obs: não esquecer de colocar 0 no inicio do ddd, e também ter 11 - 12 digitos (valores entre 0 - 9 )
 int validarCartao(char numeroCartao[]);
 int validarEmail (char email[]);
 int registroVendas();
 /*
-obs: Todas as vendas devem ser registradas com vinculo do cliente a venda denifirÃ¡ a forma de pagamento
-pagamento Ã  vista deverÃ¡ ser gerado apenas com uma parcela somente para venda
-Para pagamentos a prazo, deverÃ¡ ser gerado uma parcela para cada prestraÃ§Ã£o definida, estando vinculada Ã  venda e status incial "Em Aberto"
+obs: Todas as vendas devem ser registradas com vinculo do cliente a venda denifirá a forma de pagamento
+pagamento à vista deverá ser gerado apenas com uma parcela somente para venda
+Para pagamentos a prazo, deverá ser gerado uma parcela para cada prestração definida, estando vinculada à venda e status incial "Em Aberto"
 */
 int anoBissexto(int ano);
 
@@ -85,9 +85,9 @@ void cadastroClientes();
 void buscarClientes();
 int registroVendas();
 /*
-obs: Todas as vendas devem ser registradas com vinculo do cliente a venda denifirÃ¡ a forma de pagamento
-pagamento Ã  vista deverÃ¡ ser gerado apenas com uma parcela somente para venda
-Para pagamentos a prazo, deverÃ¡ ser gerado uma parcela para cada prestraÃ§Ã£o definida, estando vinculada Ã  venda e status incial "Em Aberto"
+obs: Todas as vendas devem ser registradas com vinculo do cliente a venda denifirá a forma de pagamento
+pagamento à vista deverá ser gerado apenas com uma parcela somente para venda
+Para pagamentos a prazo, deverá ser gerado uma parcela para cada prestração definida, estando vinculada à venda e status incial "Em Aberto"
 */
 int consultarVendas();
 /*
@@ -129,10 +129,10 @@ void cadastroClientes(){
     Cliente listaClientes[LISTA];
     int qtdClientes = 0;
     
-    // verifica se a lista já está cheia
+    // verifica se a lista j� est� cheia
     if (qtdClientes >= LISTA) {
         printf("\nLimite de clientes cadastrados atingido!\n");
-        return; // sai da função
+        return; // sai da fun��o
     }
 
     Cliente novoCliente;
@@ -211,10 +211,10 @@ int validarCartao(char numeroCartao[]){
 		//alterar o tipo char para int
 		digito = numeroCartao[i] - '0';
 
-		//se for a posiÃ§Ã£o impar, ele dobra
+		//se for a posição impar, ele dobra
 		if(casa == 1){
 			digito *= 2;
-		} if(digito > 9){ // NÃ£o deve ser mais do que nove a soma
+		} if(digito > 9){ // Não deve ser mais do que nove a soma
 			digito -= 9;
 		}
 
@@ -228,7 +228,7 @@ int validarCartao(char numeroCartao[]){
 		}
 	}
 
-	// se for divisivel por 10, o cartÃ£o Ã© valido
+	// se for divisivel por 10, o cartão é valido
 	if(soma % 10 == 0){
 		return 1;
 	} else {
@@ -250,7 +250,7 @@ int validarData(data d) {
     // colocando quantos dias tem por mes
     int diasPorMes[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    // vendo se o mes de fevereiro Ã© ano bissexto
+    // vendo se o mes de fevereiro é ano bissexto
     if(d.mes == 2 && anoBissexto(d.ano)){
         diasPorMes[2] = 29;
     }
@@ -260,8 +260,8 @@ int validarData(data d) {
         return 0;
     }
     return 1;
-    // return 0 Ã© falso
-    // return 1 Ã© verdadeiro
+    // return 0 é falso
+    // return 1 é verdadeiro
 }
 
 int anoBissexto(int ano){
@@ -301,7 +301,7 @@ int validarCPF(char cpf[]){
 // validando o email
 int validarEmail (char email[]) {
     int TAM = strlen(email);
-    int psAR = -1,psPonto = -1, qtdAR = 0;     //psAR Ã© a posiÃ§Ã£o do '@' e o psPonto Ã© a posiÃ§Ã£o do '.', o -1 Ã© 'nao encontrado'
+    int psAR = -1,psPonto = -1, qtdAR = 0;     //psAR é a posição do '@' e o psPonto é a posição do '.', o -1 é 'nao encontrado'
 	int i = 0;
 	
     for (i = 0; i < TAM; i++) {
