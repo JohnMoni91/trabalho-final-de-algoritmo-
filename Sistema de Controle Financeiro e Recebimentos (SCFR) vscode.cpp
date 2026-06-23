@@ -165,12 +165,26 @@ float parcelasVencidas() {
     return total;
 }
 
-float debitosPendentes(){
-    return;
+float debitosPendentes() {
+    float total = 0;
+    int i = 0;
+
+    for (i = 0; i < qtdParcelas; i++) {
+        if (listaParcelas[i].situacaoDaParcela == 'A' || listaParcelas[i].situacaoDaParcela == 'V') {
+            total += listaParcelas[i].valorDaParcela;
+        }
+    }
+    return total;
 }
 
 float faturamentoTotal(){
-    return;
+    int i = 0;
+    float somaTotal = 0.0;
+
+    for(i = 0; i < qtdVendas; i++){
+        somaTotal += listaVendas[i].valorTotalVenda;
+    }
+    return somaTotal;
 }
 
 int validarCPF(char cpf[]){
@@ -193,9 +207,9 @@ int validarCPF(char cpf[]){
     }
 
     for(i = 0; i < 9; i++){
-            atualNumero = cpf[i] - '0';
-            soma += (atualNumero * peso);
-            peso--;
+        atualNumero = cpf[i] - '0';
+        soma += (atualNumero * peso);
+        peso--;
     }
 
     resto = soma % 11;
@@ -514,7 +528,7 @@ void buscarClientes(){
         scanf("%d", &op);
         getchar();
 
-        switch (op)
+        switch(op)
         {
         case 1:
             printf("\nDigite o CPF: ");
@@ -756,8 +770,8 @@ void geradorParcelas(int idVenda, float valorTotal, int qtd, data dataVenda) {
     }
 }
 
-/*
-int dataAnterior(data d1, data d2) {    // compara se d1 é anterior a d2, retorna 1 se for, 0 se não for 
+
+int dataAnterior(data d1, data d2) {
     if (d1.ano < d2.ano) return 1;
     if (d1.ano > d2.ano) return 0;
     if (d1.mes < d2.mes) return 1;
@@ -767,11 +781,11 @@ int dataAnterior(data d1, data d2) {    // compara se d1 é anterior a d2, retor
 }
 
 int dataParaDias(data d) {
-    int i, dias = d.dia;        // começa a contar pelo dia de hoje
+    int i, dias = d.dia;   
     int meses[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
     for (i = 1; i < d.ano; i++) {
-        if ((i % 4 == 0 && i % 100 != 0) || (i % 400 == 0)) {   // Calculo Ano Bissexto pelas regras do calendario Gregoriano
+        if ((i % 4 == 0 && i % 100 != 0) || (i % 400 == 0)) {
             dias += 366;
         } else {
             dias += 365;
@@ -786,25 +800,11 @@ int dataParaDias(data d) {
     }
     return dias;
 }
-int calcularDiferencaDias(data dInicio, data dFim) {       // Calcula a diferença em dias entre duas datas
+int calcularDiferencaDias(data dInicio, data dFim) {     
     return dataParaDias(dFim) - dataParaDias(dInicio);
 }
-*/
 
-/*
-float debitosPendentes() {
-    float total = 0;
-    int i;
-    for (i = 0; i < qtdParcelas; i++) {
-        if (listaParcelas[i].situacaoDaParcela == 'A' || listaParcelas[i].situacaoDaParcela == 'V') {
-            total += listaParcelas[i].valorDaParcela;
-        }
-    }
-    return total;
-}
-*/
 
-/*
 void identificarParcelasAtraso() {
     data dataAtual;
     int i, contador = 0;
@@ -833,4 +833,71 @@ void identificarParcelasAtraso() {
     }
     printf("%d parcela(s) alterada(s) para 'Vencida' (V).\n", contador);
 }
-*/
+
+void quitarParcela() {
+    int idVendaBuscar, i, proximaIdx = -1;
+
+    printf("\nQUITAR PROXIMA PARCELA PENDENTE\n");
+    printf("Digite o ID da Venda: ");
+    scanf("%d", &idVendaBuscar);
+    getchar();
+
+    int menorNumero = 1000;
+    for (i = 0; i < qtdParcelas; i++) {
+        if (listaParcelas[i].idVenda == idVendaBuscar && 
+            (listaParcelas[i].situacaoDaParcela == 'A' || listaParcelas[i].situacaoDaParcela == 'V')) {
+            if (listaParcelas[i].numeroDaParcela < menorNumero) {
+                menorNumero = listaParcelas[i].numeroDaParcela;
+                proximaIdx = i;
+            }
+        }
+    }
+
+    if (proximaIdx == -1) {
+        printf("Nenhuma parcela pendente encontrada para esta venda.\n");
+        return;
+    }
+
+    Parcela *p = &listaParcelas[proximaIdx];
+    printf("Parcela N: %d | Valor Base: %.2f | Status: %c\n", p->numeroDaParcela, p->valorDaParcela, p->situacaoDaParcela);
+
+    data dataPagamento;
+    do {
+
+        printf("Digite a data de pagamento (dia mes ano): ");
+        scanf("%d %d %d", &dataPagamento.dia, &dataPagamento.mes, &dataPagamento.ano);
+        getchar();
+
+        if (validarData(dataPagamento) == 1) 
+        break;
+
+        printf("Data invalida! Tente novamente.\n");
+
+    } while (1);
+
+    float valorCobrado = p->valorDaParcela;
+    if (p->situacaoDaParcela == 'V' || dataAnterior(p->dataVencimento, dataPagamento)) {
+        int diasAtraso = calcularDiferencaDias(p->dataVencimento, dataPagamento);
+        if (diasAtraso > 0) {
+            float juros = (p->valorDaParcela * 0.02) + (p->valorDaParcela * 0.0008 * diasAtraso);
+            valorCobrado += juros;
+            printf(" -> Parcela com %d dia(s) de atraso.\n", diasAtraso);
+            printf(" -> Juros aplicados (2%% + 0.08%% ao dia): %.2f\n", juros);
+        }
+    }
+    int conf;
+    printf("Valor final a pagar: %.2f\n", valorCobrado);
+
+    printf("Confirmar recebimento? (1-Sim / 0-Nao): ");
+    
+    scanf("%d", &conf);
+    getchar();
+
+    if (conf == 1) {
+        p->situacaoDaParcela = 'R';
+        p->dataRecebimento = dataPagamento;
+        printf("Pagamento registrado com sucesso!\n");
+    } else {
+        printf("Operacao cancelada.\n");
+    }
+}
