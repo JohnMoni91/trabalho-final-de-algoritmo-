@@ -1,45 +1,35 @@
-### Sistema de Controle Financeiro e Recebimentos (SCFR)
+## 🚀 Status do Projeto: Sistema de Controle Financeiro e Recebimentos (SCFR)
 
-### Relatório de Status do Projeto - Algoritmos 1
+### ✅ O que já está PRONTO (Implementado e Testado)
 
-#### 🚀 O que já está PRONTO (Implementado e Testado)
+A base do sistema, todas as lógicas matemáticas e módulos de relatório parcial foram finalizados com sucesso, cumprindo rigorosamente os requisitos do projeto final de Algoritmos 1:
 
-A fundação do sistema já foi construída e várias lógicas de negócio pesadas foram finalizadas:
+**Estruturas de Dados (Item A):** Definição das *structs* aninhadas para Data, Cliente, Vendas e Parcela.
 
-**Estruturas de Dados (Item A):** As *structs* para Data, Cliente, Vendas e Parcela foram definidas no padrão exigido.
+**Motor de Validações (Item B):** Algoritmos de validação completos operacionais para CPF, Data (com suporte a anos bissextos), Telefone, Cartão de Crédito e E-mail.
 
-**Motor de Validações (Item B):** Todas as funções de validação críticas estão operacionais (CPF, Data, Telefone, Cartão de Crédito e E-mail).
+**Gestão de Clientes (Itens C e D):** Módulo de cadastro com validação rigorosa pré-armazenamento e sistema de busca (por CPF, Nome ou Telefone) retornando a ficha completa.
 
-**Gestão de Clientes (Itens C e D):** As funções `cadastroClientes()` e `buscarClientes()` estão implementadas e realizando as validações antes do armazenamento.
+**Gestão de Vendas (Itens E e G):** Registro de vendas atrelado a clientes já cadastrados. O sistema define a forma de pagamento e suporta a consulta completa pelo ID da venda ou CPF do cliente.
 
-* **Registrar Vendas (Item E):** A função `registroVendas()` foi concluída. Ela vincula a venda a um cliente já existente no sistema e coleta a forma de pagamento corretamente.
+* **Motor Financeiro (Itens F, H, I, J):**
+* Geração automática de parcelas projetando vencimentos e aplicando a taxa base.
 
-**Geração de Parcelas (Item F):** A função `geradorParcelas()` consegue dividir os valores e projetar os vencimentos mensais mantendo o dia base.
+* Varredura temporal para identificar atrasos e alterar automaticamente a situação para 'V' (Vencida).
 
-**Consultar Vendas (Item G):** Implementada a visualização dos dados da venda junto com as informações de suas respectivas parcelas geradas.
+* Função de `quitarParcela()` com cálculo preciso de juros (2% fixos + 0.08% ao dia).
 
-**Identificar Atrasos (Item H):** A função `identificarParcelasAtraso()` varre o vetor, cruza os vencimentos com a data inserida e atualiza corretamente o status para 'Vencida'.
+* Função `liquidarDivida()` mapeando compras e abatendo todo o montante de uma vez.
 
-**Quitar Parcela (Item I):** A função localiza a próxima prestação a vencer e permite efetuar o pagamento, calculando automaticamente a multa de 2% e os juros de 0,08% ao dia em caso de atraso.
+* **Relatórios Gerenciais (Itens K e L):** Funções `relatorioDiario()` e `relatorioMensal()` concluídas. Elas filtram os vetores cruzando as informações para exibir o total vendido, recebido, a receber e pendente em datas específicas.
 
-**Menu Principal:** A função `main` já suporta um menu interativo conectando a maioria das funcionalidades exigidas.
+**Interface e Boas Práticas (###):** Menu principal (switch-case) interligando 100% das opções operacionais , variáveis identificáveis e cabeçalho de autoria adicionado.
 
-#### 🚧 O que está PENDENTE NO CÓDIGO (Atenção a Bugs)
+### 🚧 O que AINDA FALTA fazer (To-Do List)
+Temos apenas um último requisito (que vale 10% da nota) para finalizar o desenvolvimento do sistema:
 
-**Erro na `liquidarDivida` (Item J):** A função foi declarada no topo e inserida na opção 7 do menu, mas **o corpo da função não foi criado**. Se rodarem a opção 7 agora, o código vai dar erro de compilação.
+**[ ] Dashboard Financeiro (Item M):** Desenvolver o corpo da função `dashboardFinanceiro()`.
 
-**Variável Lixo na Geração de Parcelas:** Dentro de `geradorParcelas()`, a variável `valorBase` está sendo usada na fórmula de juros compostos de 1% sem ter sido inicializada com um valor prévio. É necessário corrigir isso para o cálculo não puxar lixo de memória.
+**Regra de negócio:** Criar uma tela (painel) utilizando a criatividade para mostrar a situação financeira geral.
 
-* **Falta de Cabeçalho:** Não se esqueçam de colocar os comentários no topo do código com a identificação dos autores. É critério de avaliação de boas práticas do professor.
-
-#### 🎯 O que AINDA FALTA fazer (To-Do List da Equipe)
-
-O foco agora deve ser escrever as lógicas que estão faltando e focar totalmente nos relatórios visuais que têm grande peso na nota final:
-
-**[ ] Escrever a função `liquidarDivida()` (Item J):** Implementar a lógica que identifica uma compra, acha as parcelas e quita todas as dívidas pendentes de uma vez.
-
-**[ ] Situação Financeira Diária (Item K):** Montar a apresentação consolidada exibindo, para cada dia, os totais de vendas realizadas, o que foi recebido, o que falta receber e as pendências.
-
-**[ ] Situação Financeira Mensal (Item L):** Replicar a mesma lógica de relatório do item K, mas consolidando os valores organizados por mês.
-
-* **[ ] Painel Financeiro / Dashboard (Item M):** Essa função vale 10% da nota. É preciso criar uma visualização organizada e criativa mostrando os principais indicadores financeiros da empresa separando os valores mês a mês.
+**Regra de negócio:** Exibir de forma consolidada os valores recebidos e os valores a receber, organizando essas informações obrigatoriamente mês a mês.
