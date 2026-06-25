@@ -1,3 +1,4 @@
+//Joao Pedro Diniz Nacur e THEO LOPES MANSANO
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,6 +6,7 @@
 
 #define LISTA 20
 #define MAX_PARCELAS 10
+#define LIMITE_PARCELAS 1000
 
 typedef struct Data
 {
@@ -75,6 +77,10 @@ void geradorParcelas(int idVenda, float valorTotal, int qtd, data dataVenda);
 void quitarParcela();
 void liquidarDivida();
 void identificarParcelasAtraso();
+void relatorioDiario();
+void relatorioMensal();
+void dashboardFinanceiro();
+
 
 int main(){
 int op;
@@ -88,6 +94,9 @@ int op;
         printf("6) Quitar Parcela\n");
         printf("7) Liquidar Divida Total\n");
         printf("8) Relatorios Financeiros (Totais e Debitos)\n");
+        printf("9) Relatorio Diario\n");
+        printf("10) Relatorio Mensal\n");
+        printf("11) Dashboard Financeiro\n");
         printf("0) Sair\n");
         printf("\n");
         printf("Escolha: ");
@@ -117,8 +126,21 @@ int op;
                 liquidarDivida();
                 break;
             case 8:
-                debitosPendentes();
-                faturamentoTotal();
+                printf("\nFaturamento Total: R$ %.2f", faturamentoTotal());
+                printf("\nDebitos Pendentes: R$ %.2f", debitosPendentes());
+                printf("\nRecebido: R$ %.2f", recibos());
+                printf("\nAinda a Receber: R$ %.2f", aindaReceber());
+                printf("\nParcelas Vencidas: R$ %.2f\n", parcelasVencidas());
+                break;
+            case 9:
+                relatorioDiario();
+                break;
+
+            case 10:
+                relatorioMensal();
+                break;
+            case 11:
+                dashboardFinanceiro();
                 break;
             case 0:
                 printf("\nSaindo...");
@@ -190,6 +212,12 @@ float faturamentoTotal(){
 int validarCPF(char cpf[]){
 	int tam = strlen(cpf), i = 0, soma = 0,todosIguais = 1;
     int peso = 10, resto = 0, atualNumero = 0, digitosIniciais, digitosFinais;
+
+    for(i = 0; i < 11; i++){
+        if(cpf[i] < '0' || cpf[i] > '9'){
+            return 0;
+        }
+    }
 
 	if(tam != 11){
 		return 0;
@@ -292,6 +320,11 @@ int validarTelefone(char telefone[]) {
 int validarCartao(char numeroCartao[]){
 	int soma = 0, i = 0, tam = strlen(numeroCartao), casa = 0, digito;
 
+    for(i = 0; i < tam; i++){
+        if(numeroCartao[i] < '0' || numeroCartao[i] > '9'){
+            return 0;
+        }
+    }
 	for(i = tam - 1; i >= 0; i--){
 		digito = numeroCartao[i] - '0';
 
@@ -362,32 +395,37 @@ int registroVendas(){
             indiceCliente = i;
             break;
         }
+    }
         
-        if(indiceCliente == -1){
-            printf("\nCliente não encontrado");
-            return 0;
-        }
+    if(indiceCliente == -1){
+        printf("\nCliente nao encontrado");
+        return 0;
+    }
 
-        venda.cliente = listaClientes[indiceCliente];
-        venda.idVenda = proximoIdVenda++;
+    venda.cliente = listaClientes[indiceCliente];
+    venda.idVenda = proximoIdVenda++;
     
-        printf("\nDigite o valor total da venda: ");
-        scanf("%f", &venda.valorTotalVenda);
+    printf("\nDigite o valor total da venda: ");
+    scanf("%f", &venda.valorTotalVenda);
 
-        printf("\nDigite a data da venda");
+    printf("\nDigite a data da venda");
+    
+    do{
         printf("\nDia: ");
         scanf("%d", &venda.dataVenda.dia);
         printf("\nMes: ");
         scanf("%d", &venda.dataVenda.mes);
         printf("\nAno: ");
         scanf("%d", &venda.dataVenda.ano);
+    }while(validarData(venda.dataVenda) == 0);
             
-        printf("\nDigite qual foi a forma de pagamento: \n1) Dinheiro\n2) PIX\n3) Debito\n4) Parcelado\n");
-        scanf("%d", &venda.formaPagamento);
+    printf("\nDigite qual foi a forma de pagamento: \n1) Dinheiro\n2) PIX\n3) Debito\n4) Parcelado\n");
+    scanf("%d", &venda.formaPagamento);
+    getchar();
 
-        printf("\nDigite uma observacao: ");
-        fgets(venda.observacao, 50, stdin);
-        venda.observacao[strlen(venda.observacao) - 1] = '\0';
+    printf("\nDigite uma observacao: ");
+    fgets(venda.observacao, 50, stdin);
+    venda.observacao[strlen(venda.observacao) - 1] = '\0';
 
     if (venda.formaPagamento == 4) {
         int qtdValida = 0;
@@ -397,7 +435,7 @@ int registroVendas(){
             if (venda.qtdParcelas >= 1 && venda.qtdParcelas <= 10) {
                 qtdValida = 1;
             } else {
-                printf("Quantidade invalida! Tente novamente.\n");
+                printf("Quantidade invalida.\n");
             }
         } while (qtdValida == 0);
     } else {
@@ -410,14 +448,10 @@ int registroVendas(){
     geradorParcelas(venda.idVenda, venda.valorTotalVenda, venda.qtdParcelas, venda.dataVenda);
 
     printf("\nVenda %d registrada.\n", venda.idVenda);
-
-    }
     return 1;
 }
 
 void cadastroClientes(){
-    Cliente listaClientes[LISTA];
-    int qtdClientes = 0;
     int cpfValido = 0;
     int telefoneValido = 0;
     int dataNasciValido = 0;
@@ -458,6 +492,7 @@ void cadastroClientes(){
 
         if(validarTelefone(novoCliente.telefone) == 1){
             printf("\nTelefone valido!\n");
+            telefoneValido = 1;
         } else {
             printf("\nTelefone invalido!\n");
         }
@@ -476,6 +511,7 @@ void cadastroClientes(){
 
         if(validarData(novoCliente.dataNascimento) == 1){
             printf("\nData valida!\n");
+            dataNasciValido = 1;
         } else {
             printf("\nData invalida!\n");
         }
@@ -489,6 +525,7 @@ void cadastroClientes(){
 
         if(validarCartao(novoCliente.numeroCartao) == 1){
             printf("\nNumero do cartao valido!\n");
+            cartaoValido = 1;
         } else {
             printf("\nNumero do cartao invalido!\n");
         }
@@ -502,6 +539,7 @@ void cadastroClientes(){
 
         if(validarEmail(novoCliente.chavePix) == 1){
             printf("\nEmail/Pix valido!\n");
+            emailValido = 1;
         } else {
             printf("\nEmail invalido!\n");
         }
@@ -509,6 +547,8 @@ void cadastroClientes(){
 	
 	listaClientes[qtdClientes] = novoCliente;
     qtdClientes++;
+
+    printf("\nCliente cadastrado.\n");
 }
 
 void buscarClientes(){
@@ -556,7 +596,7 @@ void buscarClientes(){
             } 
 
             if(encontrado == 0){
-                printf("\nCliente não encontrado.");
+                printf("\nCliente nao encontrado.");
             }
 
             encontrado = 0;
@@ -588,7 +628,7 @@ void buscarClientes(){
             } 
 
             if(encontrado == 0){
-                printf("\nCliente não encontrado.");
+                printf("\nCliente nÃ£o encontrado.");
             }
             
             encontrado = 0;
@@ -620,7 +660,7 @@ void buscarClientes(){
             } 
 
             if(encontrado == 0){
-                printf("\nCliente não encontrado.");
+                printf("\nCliente nao encontrado.");
             }
             
             encontrado = 0;
@@ -747,9 +787,10 @@ void geradorParcelas(int idVenda, float valorTotal, int qtd, data dataVenda) {
     float valorBase;
 
 	valorParcela = valorTotal / qtd;
+	valorBase = valorParcela;
     vencimento = dataVenda;
 	for (i = 0; i < qtd; i++) {
-        if (qtdParcelas >= MAX_PARCELAS) {
+        if (qtdParcelas >= LIMITE_PARCELAS) {
             printf("Limite de parcelas atingido\n");
             return;
         	}
@@ -759,7 +800,6 @@ void geradorParcelas(int idVenda, float valorTotal, int qtd, data dataVenda) {
  		p.idParcela = proximoIdParcela++;
         p.idVenda  = idVenda;
         p.numeroDaParcela = i + 1;
-        p.valorDaParcela = valorParcela;
         p.dataVencimento =  vencimento;
         p.dataRecebimento.dia = 0;
         p.dataRecebimento.mes = 0;
@@ -808,20 +848,18 @@ int calcularDiferencaDias(data dInicio, data dFim) {
 void identificarParcelasAtraso() {
     data dataAtual;
     int i, contador = 0;
-    
-    printf("\nATUALIZAR STATUS DE PARCELAS EM ATRASO\n");
 
     do {
-        printf("Digite a data atual (dia mes ano): ");
+        printf("\nDigite a data atual: ");
         scanf("%d %d %d", &dataAtual.dia, &dataAtual.mes, &dataAtual.ano);
         getchar();
 
         if (validarData(dataAtual) == 1) 
         break;
         
-        printf("Data invalida! Tente novamente.\n");
+        printf("\nData invalida!\n");
         
-    } while (1);
+    } while(1);
 
     for (i = 0; i < qtdParcelas; i++) {
         if (listaParcelas[i].situacaoDaParcela == 'A') {
@@ -836,8 +874,9 @@ void identificarParcelasAtraso() {
 
 void quitarParcela() {
     int idVendaBuscar, i, proximaIdx = -1;
+    float juros = 0.0;
 
-    printf("\nQUITAR PROXIMA PARCELA PENDENTE\n");
+    printf("\nQuitar a proxima parcela pendente\n");
     printf("Digite o ID da Venda: ");
     scanf("%d", &idVendaBuscar);
     getchar();
@@ -854,50 +893,288 @@ void quitarParcela() {
     }
 
     if (proximaIdx == -1) {
-        printf("Nenhuma parcela pendente encontrada para esta venda.\n");
+        printf("Nenhuma parcela pendente encontrada.\n");
         return;
     }
 
-    Parcela *p = &listaParcelas[proximaIdx];
-    printf("Parcela N: %d | Valor Base: %.2f | Status: %c\n", p->numeroDaParcela, p->valorDaParcela, p->situacaoDaParcela);
+    printf("Parcela N: %d | Valor Base: %.2f | Status: %c\n", 
+       listaParcelas[proximaIdx].numeroDaParcela, 
+       listaParcelas[proximaIdx].valorDaParcela, 
+       listaParcelas[proximaIdx].situacaoDaParcela);
 
     data dataPagamento;
     do {
 
-        printf("Digite a data de pagamento (dia mes ano): ");
+        printf("Digite a data de pagamento: ");
         scanf("%d %d %d", &dataPagamento.dia, &dataPagamento.mes, &dataPagamento.ano);
         getchar();
 
         if (validarData(dataPagamento) == 1) 
         break;
 
-        printf("Data invalida! Tente novamente.\n");
+        printf("Data invalida!\n");
 
     } while (1);
 
-    float valorCobrado = p->valorDaParcela;
-    if (p->situacaoDaParcela == 'V' || dataAnterior(p->dataVencimento, dataPagamento)) {
-        int diasAtraso = calcularDiferencaDias(p->dataVencimento, dataPagamento);
+    float valorCobrado = listaParcelas[proximaIdx].valorDaParcela;
+    
+    if (listaParcelas[proximaIdx].situacaoDaParcela == 'V' || dataAnterior(listaParcelas[proximaIdx].dataVencimento, dataPagamento)) {
+        
+        int diasAtraso = calcularDiferencaDias(listaParcelas[proximaIdx].dataVencimento, dataPagamento);
+        
         if (diasAtraso > 0) {
-            float juros = (p->valorDaParcela * 0.02) + (p->valorDaParcela * 0.0008 * diasAtraso);
+            juros = (listaParcelas[proximaIdx].valorDaParcela * 0.02) + (listaParcelas[proximaIdx].valorDaParcela * 0.0008 * diasAtraso);
             valorCobrado += juros;
-            printf(" -> Parcela com %d dia(s) de atraso.\n", diasAtraso);
-            printf(" -> Juros aplicados (2%% + 0.08%% ao dia): %.2f\n", juros);
+            printf("Parcela com %d dia(s) de atraso.\n", diasAtraso);
+            printf("Juros aplicados (2%% + 0.08%% ao dia): %.2f\n", juros);
         }
     }
+    
     int conf;
     printf("Valor final a pagar: %.2f\n", valorCobrado);
 
     printf("Confirmar recebimento? (1-Sim / 0-Nao): ");
-    
     scanf("%d", &conf);
     getchar();
 
     if (conf == 1) {
-        p->situacaoDaParcela = 'R';
-        p->dataRecebimento = dataPagamento;
-        printf("Pagamento registrado com sucesso!\n");
+        listaParcelas[proximaIdx].situacaoDaParcela = 'R';
+        listaParcelas[proximaIdx].dataRecebimento = dataPagamento;
+        printf("Pagamento registrado.\n");
     } else {
         printf("Operacao cancelada.\n");
     }
+}
+
+void liquidarDivida(){
+	char cpfBuscar[20];
+	int k = 0, j = 0, i = 0, indiceCliente = -1, compraIdentificada = 0, indiceVendas = -1;
+	int idVendaBusca, parcelasPendentes = 0, diasAtraso;
+	float totalDivida = 0.0, juros = 0.0;
+	int escolha;
+	data dataPagamento;
+	
+	printf("\nDigite o CPF: ");
+    fgets(cpfBuscar, 20, stdin);
+
+    cpfBuscar[strlen(cpfBuscar) - 1] = '\0';
+    
+    for(i = 0; i < qtdClientes; i++){
+		if(strcmp(cpfBuscar, listaClientes[i].CPF) == 0){
+			indiceCliente = i;
+			break;
+		}
+	}
+	
+  	if(indiceCliente == -1){
+		printf("\nCliente nao encontrado");
+		return;
+	}
+	
+	printf("\nCompras vinculadas ao CPF");
+	
+	for(j = 0; j < qtdVendas; j++){
+		if(strcmp(cpfBuscar, listaVendas[j].cliente.CPF) == 0){
+			printf("\nID da Venda: %d | Valor: R$ %.2f | Data: %02d/%02d/%d", 
+               listaVendas[j].idVenda, 
+               listaVendas[j].valorTotalVenda,
+               listaVendas[j].dataVenda.dia,
+               listaVendas[j].dataVenda.mes,
+               listaVendas[j].dataVenda.ano);
+               
+        	compraIdentificada = 1;	
+		}
+	}
+	if(compraIdentificada == 0) {
+    	printf("\nO cliente nao tem registro de compras");
+    	return; 
+	}
+	
+	printf("\nQual venda deseja liquidar?");
+	scanf("%d", &idVendaBusca);
+	getchar();
+	
+	identificarParcelasAtraso();
+	
+	printf("\nDigite a data de pagamento: ");
+	scanf("%d %d %d", &dataPagamento.dia, &dataPagamento.mes, &dataPagamento.ano);
+	getchar();
+
+	
+	for(k = 0; k < qtdParcelas; k++){
+		if(listaParcelas[k].idVenda == idVendaBusca && (listaParcelas[k].situacaoDaParcela == 'A' || listaParcelas[k].situacaoDaParcela == 'V')){
+			parcelasPendentes = 1;
+			if(listaParcelas[k].situacaoDaParcela == 'V'){
+				diasAtraso = calcularDiferencaDias(listaParcelas[k].dataVencimento, dataPagamento);
+				
+				if (diasAtraso > 0) {
+					juros = (listaParcelas[k].valorDaParcela * 0.02) + (listaParcelas[k].valorDaParcela * 0.0008 * diasAtraso);
+				}
+				
+				totalDivida += (listaParcelas[k].valorDaParcela + juros);
+			}
+			
+			if(listaParcelas[k].situacaoDaParcela == 'A')
+			{
+				totalDivida += listaParcelas[k].valorDaParcela;
+			}
+		}
+	}
+	
+	if(parcelasPendentes == 0){
+		printf("\nSem parcelas pendentes");
+		return;
+	}
+	
+	printf("\nValor liquidado %d: R$ %.2f", idVendaBusca, totalDivida);
+	printf("\nConfirmar o recibo?\n1) Sim\n2)Nao");
+	scanf("%d", &escolha);
+	getchar();
+
+	if(escolha == 1){
+        for(k = 0; k < qtdParcelas; k++){
+            if(listaParcelas[k].idVenda == idVendaBusca && 
+              (listaParcelas[k].situacaoDaParcela == 'A' || listaParcelas[k].situacaoDaParcela == 'V')){
+                listaParcelas[k].situacaoDaParcela = 'R';
+                listaParcelas[k].dataRecebimento = dataPagamento;
+            }
+        }
+        
+        printf("\nDivida liquidada.\n");
+    } else {
+        printf("\nOperacaoo cancelada.\n");
+    }
+
+}
+
+void relatorioDiario(){
+    data dataBusca;
+    float totalVendido = 0.0;
+    float totalRecebido = 0.0;
+    float totalReceber = 0.0;
+    float totalPendente = 0.0;
+    int i = 0, j = 0;
+
+    do{
+        printf("\nDigite o dia: ");
+        scanf("%d", &dataBusca.dia);
+        printf("\nDigite o mes: ");
+        scanf("%d", &dataBusca.mes);
+        printf("\nDigite o ano: ");
+        scanf("%d", &dataBusca.ano);
+
+
+        if(validarData(dataBusca) == 1){
+            break;
+        }
+        printf("\nData invalida.\n");
+
+    }while(1);
+
+    for(i = 0; i < qtdVendas; i++){
+        if(dataBusca.dia == listaVendas[i].dataVenda.dia && 
+           dataBusca.mes == listaVendas[i].dataVenda.mes && 
+           dataBusca.ano == listaVendas[i].dataVenda.ano){
+            
+            totalVendido += listaVendas[i].valorTotalVenda;
+        }
+    }
+
+    for(j = 0; j < qtdParcelas; j++){
+        if(listaParcelas[j].situacaoDaParcela == 'R' && 
+            listaParcelas[j].dataRecebimento.dia == dataBusca.dia && 
+            listaParcelas[j].dataRecebimento.mes == dataBusca.mes && 
+            listaParcelas[j].dataRecebimento.ano == dataBusca.ano){
+            
+                totalRecebido += listaParcelas[j].valorDaParcela;
+        }
+
+        if(listaParcelas[j].situacaoDaParcela == 'A' && 
+            listaParcelas[j].dataVencimento.dia == dataBusca.dia && 
+            listaParcelas[j].dataVencimento.mes == dataBusca.mes && 
+            listaParcelas[j].dataVencimento.ano == dataBusca.ano){
+            
+                totalReceber += listaParcelas[j].valorDaParcela;
+        }
+
+        if(listaParcelas[j].situacaoDaParcela == 'V' && 
+            listaParcelas[j].dataVencimento.dia == dataBusca.dia && 
+            listaParcelas[j].dataVencimento.mes == dataBusca.mes && 
+            listaParcelas[j].dataVencimento.ano == dataBusca.ano){
+            
+                totalPendente += listaParcelas[j].valorDaParcela;
+        }
+    }
+
+    printf("Relatorio diario = %02d/%02d/%d\n", dataBusca.dia, dataBusca.mes, dataBusca.ano);
+    printf("Vendas Realizadas: R$ %.2f\n", totalVendido);
+    printf("Valores Recebidos: R$ %.2f\n", totalRecebido);
+    printf("Valores a Receber: R$ %.2f\n", totalReceber);
+    printf("Valores Pendentes: R$ %.2f\n", totalPendente);
+}
+
+void relatorioMensal(){
+    data dataBusca;
+    float totalVendido = 0.0;
+    float totalRecebido = 0.0;
+    float totalReceber = 0.0;
+    float totalPendente = 0.0;
+    int i = 0, j = 0;
+
+    do{
+        printf("\nDigite o mes: ");
+        scanf("%d", &dataBusca.mes);
+        printf("\nDigite o ano: ");
+        scanf("%d", &dataBusca.ano);
+
+        dataBusca.dia = 1;
+
+        if(validarData(dataBusca) == 1){
+            break;
+        }
+
+        printf("\nData invalida.\n");
+
+    }while(1);
+
+    for(i = 0; i < qtdVendas; i++){
+        if(dataBusca.mes == listaVendas[i].dataVenda.mes && 
+           dataBusca.ano == listaVendas[i].dataVenda.ano){
+            
+            totalVendido += listaVendas[i].valorTotalVenda;
+        }
+    }
+
+    for(j = 0; j < qtdParcelas; j++){
+        if(listaParcelas[j].situacaoDaParcela == 'R' && 
+            listaParcelas[j].dataRecebimento.mes == dataBusca.mes && 
+            listaParcelas[j].dataRecebimento.ano == dataBusca.ano){
+            
+                totalRecebido += listaParcelas[j].valorDaParcela;
+        }
+
+        if(listaParcelas[j].situacaoDaParcela == 'A' && 
+            listaParcelas[j].dataVencimento.mes == dataBusca.mes && 
+            listaParcelas[j].dataVencimento.ano == dataBusca.ano){
+            
+                totalReceber += listaParcelas[j].valorDaParcela;
+        }
+
+        if(listaParcelas[j].situacaoDaParcela == 'V' && 
+            listaParcelas[j].dataVencimento.mes == dataBusca.mes && 
+            listaParcelas[j].dataVencimento.ano == dataBusca.ano){
+            
+                totalPendente += listaParcelas[j].valorDaParcela;
+        }
+    }
+
+    printf("\nRelatorio Mensal = %02d/%d", dataBusca.mes, dataBusca.ano);
+    printf("\nVendas Realizadas: R$ %.2f", totalVendido);
+    printf("\nValores Recebidos: R$ %.2f", totalRecebido);
+    printf("\nValores a Receber: R$ %.2f", totalReceber);
+    printf("\nValores Pendentes: R$ %.2f", totalPendente);
+}
+
+void dashboardFinanceiro(){
+
 }
