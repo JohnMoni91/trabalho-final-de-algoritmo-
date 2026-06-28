@@ -305,7 +305,7 @@ int anoBissexto(int ano){
 
 int validarTelefone(char telefone[]) {
     int TAM = strlen(telefone);
-    int i = 0;9
+    int i;
     
     if (TAM != 11 && TAM != 12){
 		return 0;
@@ -1192,5 +1192,52 @@ void relatorioMensal(){
 }
 
 void dashboardFinanceiro(){
+    int anoBusca, mes, i, j;
+    float recebidoMes, aReceberMes, pendenteMes, vendidoMes;
 
+    printf("\nDigite o ano para gerar o painel financeiro: ");
+    scanf("%d", &anoBusca);
+    getchar(); // Limpa o buffer do teclado (padrão do seu código)
+
+    printf("\n==========================================================================\n");
+    printf("                 DASHBOARD FINANCEIRO - ANO: %d\n", anoBusca);
+    printf("==========================================================================\n");
+    printf(" MÊS |   VENDIDO   |   RECEBIDO  |  A RECEBER  |  PENDENTE/ATRASADO \n");
+    printf("==========================================================================\n");
+
+    for (mes = 1; mes <= 12; mes++) {
+        
+        vendidoMes = 0.0;
+        recebidoMes = 0.0;
+        aReceberMes = 0.0;
+        pendenteMes = 0.0;
+
+        for (i = 0; i < qtdVendas; i++) {
+            if (listaVendas[i].dataVenda.ano == anoBusca && listaVendas[i].dataVenda.mes == mes) {
+                vendidoMes += listaVendas[i].valorTotalVenda;
+            }
+        }
+
+        for (j = 0; j < qtdParcelas; j++) {
+            
+            if (listaParcelas[j].situacaoDaParcela == 'R' && 
+                listaParcelas[j].dataRecebimento.ano == anoBusca && listaParcelas[j].dataRecebimento.mes == mes) {
+                recebidoMes += listaParcelas[j].valorDaParcela;
+            }
+
+            if (listaParcelas[j].situacaoDaParcela == 'A' && 
+                listaParcelas[j].dataVencimento.ano == anoBusca && listaParcelas[j].dataVencimento.mes == mes) {
+                aReceberMes += listaParcelas[j].valorDaParcela;
+            }
+
+            if (listaParcelas[j].situacaoDaParcela == 'V' && 
+                listaParcelas[j].dataVencimento.ano == anoBusca && listaParcelas[j].dataVencimento.mes == mes) {
+                pendenteMes += listaParcelas[j].valorDaParcela;
+            }
+        }
+
+        printf(" %02d  | R$ %9.2f | R$ %9.2f | R$ %9.2f | R$ %9.2f\n", mes, vendidoMes, recebidoMes, aReceberMes, pendenteMes);
+    }
+    
+    printf("==========================================================================\n");
 }
