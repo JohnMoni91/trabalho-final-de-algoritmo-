@@ -5,7 +5,7 @@ Disciplina: Algoritmos 1
 Professor: Francisco Pereira Junior (Thesko)
 
 Autores:
-Jo„o Pedro Diniz Nacur
+Jo√£o Pedro Diniz Nacur
 Theo Lopes Mansano
 
 UTFPR - 2026
@@ -97,10 +97,13 @@ void identificarParcelasAtraso();
 void relatorioDiario();
 void relatorioMensal();
 void dashboardFinanceiro();
+void carregarDadosIniciais();
 
 // Menu do sistema
 int main(){
+carregarDadosIniciais();
 int op;
+
     do{
         printf("\nMENU\n");
         printf("1) Cadastrar Cliente\n");
@@ -731,7 +734,7 @@ data diasPorMes(data dataAtual) {
         dataAtual.ano += 1;
     }
     
-    // Evitar de digitar datas n„o existentes
+    // Evitar de digitar datas n√£o existentes
     int diasPorMesArray[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (dataAtual.mes == 2 && ((dataAtual.ano % 4 == 0 && dataAtual.ano % 100 != 0) || (dataAtual.ano % 400 == 0))) {
         diasPorMesArray[2] = 29;
@@ -859,13 +862,14 @@ void geradorParcelas(int idVenda, float valorTotal, int qtd, data dataVenda, int
             return;
         	}
 
-        if (formaPagamento == 4) {
+		if (formaPagamento == 4) {
             vencimento = diasPorMes(vencimento);
             p.valorDaParcela = valorBase * pow(1.01, i + 1);
+        } else if (formaPagamento == 3) {
+            p.valorDaParcela = valorBase * 1.05; 
         } else {
             p.valorDaParcela = valorBase;
         }
-
  		p.idParcela = proximoIdParcela++;
         p.idVenda  = idVenda;
         p.numeroDaParcela = i + 1;
@@ -1305,4 +1309,53 @@ void dashboardFinanceiro(){
 
         printf("%02d|R$ %9.2f|R$ %9.2f|R$ %9.2f|R$ %9.2f\n", mes, vendidoMes, recebidoMes, aReceberMes, pendenteMes);
     }
+}
+
+// Registro de 2 clientes exemplos
+void carregarDadosIniciais() {
+    strcpy(listaClientes[0].CPF, "34501547022");
+    strcpy(listaClientes[0].nome, "Cliente tipo 1");
+    strcpy(listaClientes[0].telefone, "06334633016");
+    listaClientes[0].dataNascimento.dia = 10;
+    listaClientes[0].dataNascimento.mes = 5;
+    listaClientes[0].dataNascimento.ano = 2005;
+    strcpy(listaClientes[0].numeroCartao, "5556733713191511");
+    strcpy(listaClientes[0].chavePix, "cliente1@email.com");
+    qtdClientes++;
+
+    strcpy(listaClientes[1].CPF, "10987654321");
+    strcpy(listaClientes[1].nome, "Cliente tipo 2");
+    strcpy(listaClientes[1].telefone, "08722752288");
+    listaClientes[1].dataNascimento.dia = 25;
+    listaClientes[1].dataNascimento.mes = 4;
+    listaClientes[1].dataNascimento.ano = 1996;
+    strcpy(listaClientes[1].numeroCartao, "5479353087808121");
+    strcpy(listaClientes[1].chavePix, "cliente2@email.com");
+    qtdClientes++;
+
+    vendas v1;
+    v1.idVenda = proximoIdVenda++;
+    v1.cliente = listaClientes[0];
+    v1.valorTotalVenda = 200.00;
+    v1.formaPagamento = 2;
+    v1.qtdParcelas = 1;
+    v1.dataVenda.dia = 10;
+    v1.dataVenda.mes = 6;
+    v1.dataVenda.ano = 2026;
+    strcpy(v1.observacao, "Compra em Pix inicial");
+    listaVendas[qtdVendas++] = v1;
+    geradorParcelas(v1.idVenda, v1.valorTotalVenda, v1.qtdParcelas, v1.dataVenda, v1.formaPagamento);
+
+    vendas v2;
+    v2.idVenda = proximoIdVenda++;
+    v2.cliente = listaClientes[1];
+    v2.valorTotalVenda = 300.00;
+    v2.formaPagamento = 4;
+    v2.qtdParcelas = 3;
+    v2.dataVenda.dia = 15;
+    v2.dataVenda.mes = 5;
+    v2.dataVenda.ano = 2026;
+    strcpy(v2.observacao, "Compra parcelada inicial");
+    listaVendas[qtdVendas++] = v2;
+    geradorParcelas(v2.idVenda, v2.valorTotalVenda, v2.qtdParcelas, v2.dataVenda, v2.formaPagamento);
 }
