@@ -25,11 +25,7 @@ A base do sistema, todas as lógicas matemáticas e módulos de relatório parci
 
 **Interface e Boas Práticas (###):** Menu principal (switch-case) interligando 100% das opções operacionais , variáveis identificáveis e cabeçalho de autoria adicionado.
 
+**[ ] Dashboard Financeiro (Item M):** Desenvolvido o corpo da função `dashboardFinanceiro()`, com um painel que exibe os valores recebidos, a vencer e previstos de mês a mês, organizado separadamente.
+
 ### 🚧 O que AINDA FALTA fazer (To-Do List)
-Temos apenas um último requisito (que vale 10% da nota) para finalizar o desenvolvimento do sistema:
-
-**[ ] Dashboard Financeiro (Item M):** Desenvolver o corpo da função `dashboardFinanceiro()`.
-
-**Regra de negócio:** Criar uma tela (painel) utilizando a criatividade para mostrar a situação financeira geral.
-
-**Regra de negócio:** Exibir de forma consolidada os valores recebidos e os valores a receber, organizando essas informações obrigatoriamente mês a mês.
+Por enquanto nada uhul.
